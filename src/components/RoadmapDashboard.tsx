@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, CircleDashed, Search, Sparkles, Target, Zap } from "lucide-react";
+import { CheckCircle2, CircleDashed, ExternalLink, Search, Sparkles, Target, Zap } from "lucide-react";
 import { initialRoadmap } from "@/data/initialRoadmap";
 import { loadState, saveState } from "@/lib/storage";
 import type { RoadmapItem, RoadmapStatus } from "@/lib/types";
@@ -97,6 +97,9 @@ function Stat({ icon, value, label, tone }: { icon: React.ReactNode; value: numb
 }
 
 function RoadmapCard({ item, onChange }: { item: RoadmapItem; onChange: (patch: Partial<RoadmapItem>) => void }) {
+  const placementUrl = item.targetUrl.trim();
+  const externalUrl = /^https?:\/\//i.test(placementUrl) ? placementUrl : `https://${placementUrl}`;
+
   return (
     <article className={`card status-${item.status}`}>
       <div className="card-top"><span className="number">{String(item.id).padStart(2, "0")}</span><span className={`priority ${item.priority}`}>{item.priority === "high" ? "ВИСОКИЙ" : item.priority === "medium" ? "СЕРЕДНІЙ" : "НИЗЬКИЙ"}</span></div>
@@ -105,7 +108,14 @@ function RoadmapCard({ item, onChange }: { item: RoadmapItem; onChange: (patch: 
       <select value={item.status} onChange={(event) => onChange({ status: event.target.value as RoadmapStatus })}>
         {Object.entries(statusLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
       </select>
-      <input className="url" value={item.targetUrl} onChange={(event) => onChange({ targetUrl: event.target.value })} placeholder="URL розміщення" />
+      <div className="url-field">
+        <input className="url" value={item.targetUrl} onChange={(event) => onChange({ targetUrl: event.target.value })} placeholder="URL розміщення" />
+        {placementUrl && (
+          <a href={externalUrl} target="_blank" rel="noopener noreferrer" aria-label={`Відкрити ${item.title} у новій вкладці`} title="Відкрити у новій вкладці">
+            <ExternalLink size={14} />
+          </a>
+        )}
+      </div>
       <textarea value={item.notes} onChange={(event) => onChange({ notes: event.target.value })} placeholder="Додати нотатку..." rows={2} />
     </article>
   );
