@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { AlertCircle, Check, CheckCircle2, CircleDashed, ExternalLink, LoaderCircle, RefreshCw, Search, Sparkles, Target, X, Zap } from "lucide-react";
 import { initialRoadmap } from "@/data/initialRoadmap";
 import { loadRoadmapItems, mergeRoadmapRow, saveRoadmapItem, subscribeToRoadmapChanges } from "@/lib/roadmapRepository";
@@ -145,7 +146,13 @@ export function RoadmapDashboard() {
   return (
     <main>
       <header className="topbar">
-        <div className="brand"><span className="brand-mark"><Sparkles size={18} /></span><span>MY TRANSFER</span><em>Roadmap</em></div>
+        <div className="topbar-left">
+          <Link href="/" className="brand"><span className="brand-mark"><Sparkles size={18} /></span><span>MY TRANSFER</span></Link>
+          <nav className="main-nav" aria-label="Основна навігація">
+            <Link href="/" className="active">Roadmap</Link>
+            <Link href="/company">Company Info</Link>
+          </nav>
+        </div>
         <div className="top-progress"><span>{stats.progress}% виконано</span><div><i style={{ width: `${stats.progress}%` }} /></div></div>
         <DatabaseBeacon />
       </header>
