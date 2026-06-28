@@ -127,6 +127,12 @@ export const companyInfoBlocks: CompanyInfoBlock[] = [
     content: companyProfile.company.phone,
   },
   {
+    id: "email",
+    title: "Електронна пошта",
+    hint: "Email / Contact email",
+    content: companyProfile.company.email,
+  },
+  {
     id: "business-categories",
     title: "Категорії бізнесу",
     hint: "Business categories / Directory categories",

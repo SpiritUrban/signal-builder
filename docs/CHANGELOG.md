@@ -296,3 +296,14 @@
 ## Назва коміту
 
 `Expand My Transfer company knowledge base`
+
+# Ітерація 17 — 2026-06-28
+
+## Зроблено
+
+- Додано email `mytransfer.com.ua@gmail.com` у структурований JSON-профіль.
+- На Company Info додано окрему картку електронної пошти з кнопкою копіювання.
+
+## Назва коміту
+
+`Add company contact email`

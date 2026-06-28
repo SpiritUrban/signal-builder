@@ -2,7 +2,8 @@
   "company": {
     "name": "My Transfer",
     "website": "https://my-transfer.com.ua",
-    "phone": "+48 577 525 864"
+    "phone": "+48 577 525 864",
+    "email": "mytransfer.com.ua@gmail.com"
   },
   "additionalServices": [
     {
