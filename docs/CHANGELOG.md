@@ -153,3 +153,41 @@
 ## Назва коміту
 
 `Validate Supabase key before deployment`
+
+# Ітерація 9 — 2026-06-28
+
+## Зроблено
+
+- Повністю видалено читання й запис у `localStorage`.
+- Додано таблицю Supabase `roadmap_items` для статусів, URL, нотаток і часу оновлення.
+- Додано SQL migration із RLS-політиками, trigger `updated_at` та Realtime publication.
+- Зміни картки зберігаються після debounce 3 секунди.
+- На картці додано лаконічні стани: очікує, зберігається, збережено, помилка.
+- При помилці виконуються три автоматичні спроби; після них доступна ручна кнопка retry.
+- Підключено Supabase Realtime для синхронізації змін між браузерами.
+- Додано захист незбереженої локальної правки від перезапису Realtime-подією.
+- Health-check та CI probe переведено на реальну таблицю `roadmap_items`.
+- Додано інструкцію `docs/SUPABASE_SETUP.md`.
+
+## Перевірка
+
+- `npx tsc --noEmit`
+- `npm run lint`
+
+## Назва коміту
+
+`Move roadmap persistence to Supabase`
+
+# Ітерація 10 — 2026-06-28
+
+## Зроблено
+
+- Додано документ `docs/SUPABASE_DATA_FLOW.md`.
+- Описано принцип роботи Next.js, PostgREST, PostgreSQL, RLS і Realtime.
+- Додано простий CRUD-приклад.
+- Додано розширений приклад autosave із debounce, retry та live-синхронізацією.
+- Задокументовано захист незбережених змін і поточну модель безпеки.
+
+## Назва коміту
+
+`Document Supabase persistence and realtime flow`

@@ -28,7 +28,9 @@ export interface RoadmapItem {
   updatedAt: string;
 }
 
-export interface RoadmapState {
-  items: RoadmapItem[];
-  updatedAt: string;
+export type CardSaveStatus = "idle" | "pending" | "saving" | "saved" | "error";
+
+export interface CardSaveState {
+  status: CardSaveStatus;
+  attempt: number;
 }

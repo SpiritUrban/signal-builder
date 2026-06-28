@@ -44,9 +44,9 @@ jobs:
         run: |
           status=$(curl --silent --output /dev/null --write-out "%{http_code}" \
             --header "apikey: $NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" \
-            "$NEXT_PUBLIC_SUPABASE_URL/rest/v1/__connection_probe?select=id&limit=1")
+            "$NEXT_PUBLIC_SUPABASE_URL/rest/v1/roadmap_items?select=id&limit=1")
           echo "Supabase probe HTTP: $status"
-          if [[ "$status" != "200" && "$status" != "404" ]]; then
+          if [[ "$status" != "200" ]]; then
             echo "::error::Supabase rejected the configured publishable key (HTTP $status)"
             exit 1
           fi

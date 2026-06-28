@@ -10,7 +10,7 @@ const supabasePublishableKey = requirePublicEnv(
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
 );
-const supabaseProbeEndpoint = `${supabaseUrl}/rest/v1/__connection_probe?select=id&limit=1`;
+const supabaseProbeEndpoint = `${supabaseUrl}/rest/v1/roadmap_items?select=id&limit=1`;
 const buildTimestamp = process.env.NEXT_PUBLIC_BUILD_TIMESTAMP ?? "local-dev";
 
 export const supabaseDebug = {
@@ -48,7 +48,7 @@ export async function checkSupabaseHealth(): Promise<SupabaseHealth> {
       cache: "no-store",
     });
     const latency = Math.round(performance.now() - startedAt);
-    const isConnected = response.ok || response.status === 404;
+    const isConnected = response.ok;
 
     return {
       status: isConnected ? "online" : "offline",
@@ -57,9 +57,7 @@ export async function checkSupabaseHealth(): Promise<SupabaseHealth> {
       project,
       checkedAt: new Date().toISOString(),
       message: isConnected
-        ? response.status === 404
-          ? "REST доступний · probe-таблиця не потрібна"
-          : "З’єднання стабільне"
+        ? "Roadmap API і база доступні"
         : response.status === 401
           ? "Supabase не прийняв publishable key"
           : `Сервер відповів із помилкою ${response.status}`,
