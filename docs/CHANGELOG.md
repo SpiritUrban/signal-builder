@@ -103,3 +103,27 @@
 ## Назва коміту
 
 `Fix Supabase variables in GitHub Pages build`
+
+# Ітерація 7 — 2026-06-28
+
+## Зроблено
+
+- Проведено повний аудит env-назв, Supabase client, beacon, GitHub Actions і опублікованого JS bundle.
+- У workflow додано fail-fast перевірку наявності URL та publishable key перед `next build`.
+- У GitHub Actions log виводяться безпечні діагностичні дані: URL, наявність ключа, довжина та перші 15 символів.
+- У beacon-попап додано env URL, наявність і довжину ключа, префікс, endpoint, HTTP-статус і build timestamp.
+- Додано тимчасовий console debug із тими самими публічними діагностичними даними.
+- Підтверджено, що продакшн bundle містить актуальний URL, 46-символьний publishable key і probe endpoint.
+- Виявлено GitHub Pages HTML cache `max-age=600`; content-hashed JS bundle оновлюється після нового build.
+
+## Перевірка
+
+- `npx tsc --noEmit`
+- `npm run lint`
+- `npm run build`
+- Перевірка опублікованого GitHub Pages HTML і JS bundle.
+- Перевірка останнього успішного GitHub Actions run та commit SHA.
+
+## Назва коміту
+
+`Add Supabase deployment diagnostics`

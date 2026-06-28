@@ -24,6 +24,18 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Validate public Supabase variables
+        shell: bash
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          test -n "$NEXT_PUBLIC_SUPABASE_URL" || { echo "::error::NEXT_PUBLIC_SUPABASE_URL is empty"; exit 1; }
+          test -n "$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" || { echo "::error::NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is empty"; exit 1; }
+          echo "Supabase URL: $NEXT_PUBLIC_SUPABASE_URL"
+          echo "Supabase key present: true"
+          echo "Supabase key length: ${#NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}"
+          echo "Supabase key prefix: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:0:15}"
       - name: Build
         run: npm run build
         env:

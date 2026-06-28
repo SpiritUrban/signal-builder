@@ -10,6 +10,19 @@ const supabasePublishableKey = requirePublicEnv(
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
 );
+const supabaseProbeEndpoint = `${supabaseUrl}/rest/v1/__connection_probe?select=id&limit=1`;
+const buildTimestamp = process.env.NEXT_PUBLIC_BUILD_TIMESTAMP ?? "local-dev";
+
+export const supabaseDebug = {
+  url: supabaseUrl,
+  hasKey: Boolean(supabasePublishableKey),
+  keyLength: supabasePublishableKey.length,
+  keyPrefix: supabasePublishableKey.slice(0, 15),
+  endpoint: supabaseProbeEndpoint,
+  buildTimestamp,
+};
+
+console.info("[Supabase debug]", supabaseDebug);
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey);
 
@@ -27,7 +40,7 @@ export async function checkSupabaseHealth(): Promise<SupabaseHealth> {
   const project = new URL(supabaseUrl).hostname;
 
   try {
-    const response = await fetch(`${supabaseUrl}/rest/v1/__connection_probe?select=id&limit=1`, {
+    const response = await fetch(supabaseProbeEndpoint, {
       method: "GET",
       headers: {
         apikey: supabasePublishableKey,

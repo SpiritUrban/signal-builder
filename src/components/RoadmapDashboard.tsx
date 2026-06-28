@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, CircleDashed, ExternalLink, Search, Sparkles, Target, Zap } from "lucide-react";
 import { initialRoadmap } from "@/data/initialRoadmap";
 import { loadState, saveState } from "@/lib/storage";
-import { checkSupabaseHealth, type SupabaseHealth } from "@/lib/supabase";
+import { checkSupabaseHealth, supabaseDebug, type SupabaseHealth } from "@/lib/supabase";
 import type { RoadmapItem, RoadmapStatus } from "@/lib/types";
 
 const statusLabels: Record<RoadmapStatus, string> = {
@@ -128,9 +128,14 @@ function DatabaseBeacon() {
           <div><b>{label}</b><small>{health.message}</small></div>
         </div>
         <dl>
+          <div><dt>Env URL</dt><dd title={supabaseDebug.url}>{supabaseDebug.url}</dd></div>
+          <div><dt>Ключ</dt><dd>{supabaseDebug.hasKey ? `є · ${supabaseDebug.keyLength} симв.` : "відсутній"}</dd></div>
+          <div><dt>Префікс</dt><dd>{supabaseDebug.keyPrefix}</dd></div>
+          <div><dt>Endpoint</dt><dd title={supabaseDebug.endpoint}>{supabaseDebug.endpoint}</dd></div>
           <div><dt>Проєкт</dt><dd>{health.project}</dd></div>
           <div><dt>Затримка</dt><dd>{health.latency === null ? "—" : `${health.latency} мс`}</dd></div>
           <div><dt>HTTP</dt><dd>{health.httpStatus ?? "—"}</dd></div>
+          <div><dt>Build</dt><dd title={supabaseDebug.buildTimestamp}>{supabaseDebug.buildTimestamp === "local-dev" ? "local-dev" : new Date(supabaseDebug.buildTimestamp).toLocaleString("uk-UA")}</dd></div>
           <div><dt>Перевірено</dt><dd>{health.checkedAt ? new Date(health.checkedAt).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—"}</dd></div>
         </dl>
         <button className="db-recheck" onClick={() => void check()} disabled={health.status === "checking"}>Перевірити ще раз</button>
