@@ -66,6 +66,20 @@ export async function saveRoadmapItem(item: RoadmapItem): Promise<RoadmapRow> {
   return data as RoadmapRow;
 }
 
+export async function restoreRoadmapItems(items: RoadmapItem[]): Promise<RoadmapItem[]> {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .upsert(items.map(toRow), { onConflict: "id" })
+    .select();
+  if (error) throw error;
+
+  const rowById = new Map(((data ?? []) as RoadmapRow[]).map((row) => [row.id, row]));
+  return items.map((item) => {
+    const row = rowById.get(item.id);
+    return row ? mergeRoadmapRow(item, row) : item;
+  });
+}
+
 export function subscribeToRoadmapChanges(onChange: (row: RoadmapRow) => void) {
   const channel = supabase
     .channel("roadmap-items-live")

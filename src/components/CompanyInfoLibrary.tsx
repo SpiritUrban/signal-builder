@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Check, Copy, ExternalLink, Sparkles } from "lucide-react";
 import { companyInfoBlocks, type CompanyInfoBlock } from "@/data/companyInfo";
+import { DirectoryCredentialsPanel } from "./DirectoryCredentialsPanel";
 
 export function CompanyInfoLibrary() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -38,6 +39,8 @@ export function CompanyInfoLibrary() {
           <div><p className="eyebrow">CONTENT LIBRARY</p><h1>Інформація<br /><span>про компанію</span></h1></div>
           <p>Структуровані тексти для каталогів, профілів, оголошень і створення нового контенту. Кожен блок копіюється одним кліком.</p>
         </section>
+
+        <DirectoryCredentialsPanel />
 
         <section className="company-grid">
           {companyInfoBlocks.map((block) => (

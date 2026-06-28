@@ -1,9 +1,63 @@
 {
   "company": {
     "name": "My Transfer",
+    "legalName": "MyTransfer Vadym Serhiienko",
+    "taxId": "524-305-25-48",
     "website": "https://my-transfer.com.ua",
     "phone": "+48 577 525 864",
     "email": "mytransfer.com.ua@gmail.com"
+  },
+  "address": {
+    "country": "Poland",
+    "city": "Warszawa",
+    "region": "Мазовецьке воєводство",
+    "postalCode": "01-001",
+    "addressLine1": "Aleja Jana Pawła II 43A lok. 37B",
+    "addressLine2": ""
+  },
+  "legal": {
+    "owner": "Vadym Serhiienko",
+    "legalName": "MyTransfer Vadym Serhiienko",
+    "registrationCountry": "Poland",
+    "registrationCity": "Warszawa",
+    "legalAddress": "Aleja Jana Pawła II 43A lok. 37B",
+    "postalCode": "01-001",
+    "nip": "524-305-25-48",
+    "licenseNumber": "26/2025",
+    "licenseType": "Road Passenger Transportation",
+    "licenseIssued": "2025-11-28",
+    "licenseValidUntil": "2055-11-28"
+  },
+  "contactPerson": {
+    "firstName": "Vadym",
+    "lastName": "Serhiienko",
+    "role": "Owner",
+    "email": "mytransfer.com.ua@gmail.com",
+    "phone": "+48 577 525 864"
+  },
+  "social": {
+    "facebook": "https://www.facebook.com/MyTransferUA.PL.EU",
+    "instagram": "",
+    "whatsapp": "",
+    "telegram": "",
+    "youtube": "",
+    "tiktok": "",
+    "linkedin": ""
+  },
+  "operations": {
+    "workingHours": "24/7",
+    "alwaysOpen": true,
+    "serviceLanguages": [],
+    "countries": [
+      "Польща",
+      "Україна",
+      "Німеччина",
+      "Чехія",
+      "Словаччина",
+      "Австрія",
+      "Угорщина",
+      "Країни Європейського Союзу"
+    ]
   },
   "additionalServices": [
     {

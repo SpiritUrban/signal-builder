@@ -7,6 +7,7 @@ import { initialRoadmap } from "@/data/initialRoadmap";
 import { loadRoadmapItems, mergeRoadmapRow, saveRoadmapItem, subscribeToRoadmapChanges } from "@/lib/roadmapRepository";
 import { checkSupabaseHealth, supabaseDebug, type SupabaseHealth } from "@/lib/supabase";
 import type { CardSaveState, RoadmapItem, RoadmapStatus } from "@/lib/types";
+import { RoadmapBackupMenu } from "./RoadmapBackupMenu";
 
 const statusLabels: Record<RoadmapStatus, string> = {
   planned: "Заплановано",
@@ -129,6 +130,13 @@ export function RoadmapDashboard() {
     void persistItem(id, 1, revision);
   }, [persistItem]);
 
+  const applyRestoredItems = useCallback((restored: RoadmapItem[]) => {
+    itemsRef.current = restored;
+    setItems(restored);
+    setSaveStates({});
+    saveStatesRef.current = {};
+  }, []);
+
   useEffect(() => {
     if (focusedItemId === null) return;
     const closeOnEscape = (event: KeyboardEvent) => {
@@ -154,7 +162,10 @@ export function RoadmapDashboard() {
           </nav>
         </div>
         <div className="top-progress"><span>{stats.progress}% виконано</span><div><i style={{ width: `${stats.progress}%` }} /></div></div>
-        <DatabaseBeacon />
+        <div className="topbar-tools">
+          <RoadmapBackupMenu items={items} onRestored={applyRestoredItems} />
+          <DatabaseBeacon />
+        </div>
       </header>
 
       <div className="shell">

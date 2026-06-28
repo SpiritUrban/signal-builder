@@ -13,18 +13,6 @@ const lines = (items: string[]) => items.join("\n");
 
 export const companyInfoBlocks: CompanyInfoBlock[] = [
   {
-    id: "name",
-    title: "Назва компанії",
-    hint: "Company name / Business name",
-    content: companyProfile.company.name,
-  },
-  {
-    id: "website",
-    title: "Сайт",
-    hint: "Website URL",
-    content: companyProfile.company.website,
-  },
-  {
     id: "activity",
     title: "Напрям діяльності",
     hint: "Business category / Activity",
@@ -106,38 +94,12 @@ export const companyInfoBlocks: CompanyInfoBlock[] = [
     content: lines(companyProfile.additionalServices.map((service) => `${service.name} — ${service.description}`)),
   },
   {
-    id: "geography",
-    title: "Географія роботи",
-    hint: "Coverage area",
-    type: "list",
-    content: lines(companyProfile.countriesServed),
-  },
-  {
     id: "keywords",
     title: "Ключові слова",
     hint: "SEO keywords / Tags",
     type: "keywords",
     content: lines(companyProfile.seoKeywords),
     featured: true,
-  },
-  {
-    id: "phone",
-    title: "Телефон",
-    hint: "Phone / Contact number",
-    content: companyProfile.company.phone,
-  },
-  {
-    id: "email",
-    title: "Електронна пошта",
-    hint: "Email / Contact email",
-    content: companyProfile.company.email,
-  },
-  {
-    id: "business-categories",
-    title: "Категорії бізнесу",
-    hint: "Business categories / Directory categories",
-    type: "list",
-    content: lines(companyProfile.categories),
   },
   {
     id: "partner-types",
