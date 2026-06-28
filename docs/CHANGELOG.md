@@ -85,3 +85,21 @@
 ## Назва коміту
 
 `Organize project documentation`
+
+# Ітерація 6 — 2026-06-28
+
+## Зроблено
+
+- GitHub Actions переведено з `secrets.*` на `vars.*` для публічних Supabase-змінних.
+- Health-check переведено на безпечний PostgREST probe лише з `apikey`, оскільки `sb_publishable_` не є JWT для Bearer-заголовка.
+- Очікуваний `404` неіснуючої probe-таблиці правильно трактується як успішне з’єднання з PostgREST.
+- Для HTTP 401 індикатор тепер показує точне повідомлення про неприйнятий publishable key.
+
+## Перевірка
+
+- Локальний PostgREST probe: ключ прийнято, gateway повернув очікуваний `404`.
+- `npx tsc --noEmit`
+
+## Назва коміту
+
+`Fix Supabase variables in GitHub Pages build`

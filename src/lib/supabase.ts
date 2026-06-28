@@ -27,23 +27,29 @@ export async function checkSupabaseHealth(): Promise<SupabaseHealth> {
   const project = new URL(supabaseUrl).hostname;
 
   try {
-    const response = await fetch(`${supabaseUrl}/rest/v1/`, {
+    const response = await fetch(`${supabaseUrl}/rest/v1/__connection_probe?select=id&limit=1`, {
       method: "GET",
       headers: {
         apikey: supabasePublishableKey,
-        Authorization: `Bearer ${supabasePublishableKey}`,
       },
       cache: "no-store",
     });
     const latency = Math.round(performance.now() - startedAt);
+    const isConnected = response.ok || response.status === 404;
 
     return {
-      status: response.ok ? "online" : "offline",
+      status: isConnected ? "online" : "offline",
       latency,
       httpStatus: response.status,
       project,
       checkedAt: new Date().toISOString(),
-      message: response.ok ? "З’єднання стабільне" : `Сервер відповів із помилкою ${response.status}`,
+      message: isConnected
+        ? response.status === 404
+          ? "REST доступний · probe-таблиця не потрібна"
+          : "З’єднання стабільне"
+        : response.status === 401
+          ? "Supabase не прийняв publishable key"
+          : `Сервер відповів із помилкою ${response.status}`,
     };
   } catch {
     return {
