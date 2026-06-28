@@ -127,3 +127,29 @@
 ## Назва коміту
 
 `Add Supabase deployment diagnostics`
+
+# Ітерація 8 — 2026-06-28
+
+## Зроблено
+
+- Fingerprint-аудит довів, що локальний і production publishable keys різні.
+- Локальний ключ проходить PostgREST probe з HTTP 404, production key отримує HTTP 401.
+- У GitHub Actions додано реальний REST probe: deploy з неправильним ключем тепер зупиняється до build.
+- Build timestamp формується один раз у workflow та передається через `GITHUB_ENV`.
+- Прибрано нестабільний `new Date()` з `next.config.ts`, який генерував різні timestamp під час одного build.
+- Timestamp відображається у стабільному ISO-форматі, що усуває React hydration error #418.
+
+## Потрібна зовнішня дія
+
+- Замінити значення Repository Variable `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` на актуальне значення з локального `.env.local`.
+
+## Перевірка
+
+- Локальний key fingerprint: `682899879f346ac7`, probe HTTP 404.
+- Production key fingerprint: `d5dbdf8eaecafda5`, probe HTTP 401.
+- `npx tsc --noEmit`
+- `npm run lint`
+
+## Назва коміту
+
+`Validate Supabase key before deployment`

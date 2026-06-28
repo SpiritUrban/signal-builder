@@ -135,7 +135,7 @@ function DatabaseBeacon() {
           <div><dt>Проєкт</dt><dd>{health.project}</dd></div>
           <div><dt>Затримка</dt><dd>{health.latency === null ? "—" : `${health.latency} мс`}</dd></div>
           <div><dt>HTTP</dt><dd>{health.httpStatus ?? "—"}</dd></div>
-          <div><dt>Build</dt><dd title={supabaseDebug.buildTimestamp}>{supabaseDebug.buildTimestamp === "local-dev" ? "local-dev" : new Date(supabaseDebug.buildTimestamp).toLocaleString("uk-UA")}</dd></div>
+          <div><dt>Build</dt><dd title={supabaseDebug.buildTimestamp}>{supabaseDebug.buildTimestamp}</dd></div>
           <div><dt>Перевірено</dt><dd>{health.checkedAt ? new Date(health.checkedAt).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—"}</dd></div>
         </dl>
         <button className="db-recheck" onClick={() => void check()} disabled={health.status === "checking"}>Перевірити ще раз</button>

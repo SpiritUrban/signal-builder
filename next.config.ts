@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const repository = "signal-builder";
 const isProduction = process.env.NODE_ENV === "production";
-const buildTimestamp = new Date().toISOString();
+const buildTimestamp = process.env.NEXT_PUBLIC_BUILD_TIMESTAMP || "local-dev";
 
 const nextConfig: NextConfig = {
   output: "export",
