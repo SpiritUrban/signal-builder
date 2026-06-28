@@ -299,7 +299,19 @@ function RoadmapCard({
           <span className={`priority ${item.priority}`}>{item.priority === "high" ? "ВИСОКИЙ" : item.priority === "medium" ? "СЕРЕДНІЙ" : "НИЗЬКИЙ"}</span>
         </div>
       </div>
-      <h3>{item.title}</h3>
+      <div className="card-title-row">
+        <h3>{item.title}</h3>
+        <a
+          className="service-link"
+          href={item.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Відкрити ${item.title}`}
+          title={`Перейти до ${item.title}`}
+        >
+          <ExternalLink size={13} />
+        </a>
+      </div>
       <div className="metrics"><span>SEO <b>{"●".repeat(item.seoValue)}</b></span><span>Складність <b>{"●".repeat(item.difficulty)}</b></span></div>
       <select value={item.status} onChange={(event) => onChange({ status: event.target.value as RoadmapStatus })}>
         {Object.entries(statusLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}

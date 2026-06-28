@@ -67,7 +67,11 @@ button, input, select, textarea { font: inherit; }
 .save-signal.error { color: white; background: #ff626f; box-shadow: 0 0 0 3px #ff626f18; cursor: pointer; }
 .save-signal:disabled { cursor: default; }
 @keyframes save-spin { to { transform: rotate(360deg); } }
-.card h3 { font-size: 15px; margin: 18px 0 14px; min-height: 36px; }.metrics { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin-bottom: 14px; }.metrics b { color: var(--cyan); letter-spacing: 1px; }
+.card-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin: 18px 0 14px; min-height: 36px; }
+.card-title-row h3 { flex: 1; font-size: 15px; margin: 0; }
+.service-link { flex: 0 0 auto; width: 25px; height: 25px; display: grid; place-items: center; color: #92a0b8; background: #9aabc80b; border: 1px solid #9aabc824; border-radius: 6px; opacity: .62; transition: opacity .2s, color .2s, border-color .2s, background .2s; }
+.service-link:hover { color: var(--cyan); background: #39e6da12; border-color: #39e6da45; opacity: 1; }
+.metrics { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin-bottom: 14px; }.metrics b { color: var(--cyan); letter-spacing: 1px; }
 .card select, .card .url, .card textarea { width: 100%; color: #ccd2df; background: #080b12; border: 1px solid #242a3a; border-radius: 8px; padding: 8px 9px; outline: none; font-size: 11px; margin-top: 7px; }.card textarea { resize: vertical; }
 .url-field { position: relative; }
 .url-field .url { padding-right: 38px; }
