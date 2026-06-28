@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, CircleDashed, ExternalLink, Search, Sparkles, Target, Zap } from "lucide-react";
 import { initialRoadmap } from "@/data/initialRoadmap";
 import { loadState, saveState } from "@/lib/storage";
+import { checkSupabaseHealth, type SupabaseHealth } from "@/lib/supabase";
 import type { RoadmapItem, RoadmapStatus } from "@/lib/types";
 
 const statusLabels: Record<RoadmapStatus, string> = {
@@ -49,7 +50,7 @@ export function RoadmapDashboard() {
       <header className="topbar">
         <div className="brand"><span className="brand-mark"><Sparkles size={18} /></span><span>MY TRANSFER</span><em>Roadmap</em></div>
         <div className="top-progress"><span>{stats.progress}% виконано</span><div><i style={{ width: `${stats.progress}%` }} /></div></div>
-        <button className="avatar">MT</button>
+        <DatabaseBeacon />
       </header>
 
       <div className="shell">
@@ -89,6 +90,52 @@ export function RoadmapDashboard() {
         </section>
       </div>
     </main>
+  );
+}
+
+const initialHealth: SupabaseHealth = {
+  status: "checking",
+  latency: null,
+  httpStatus: null,
+  project: "Supabase",
+  checkedAt: null,
+  message: "Перевіряємо з’єднання…",
+};
+
+function DatabaseBeacon() {
+  const [health, setHealth] = useState(initialHealth);
+  const [open, setOpen] = useState(false);
+
+  const check = async () => {
+    setHealth((current) => ({ ...current, status: "checking", message: "Перевіряємо з’єднання…" }));
+    setHealth(await checkSupabaseHealth());
+  };
+
+  useEffect(() => {
+    void check();
+  }, []);
+
+  const label = health.status === "online" ? "База доступна" : health.status === "offline" ? "База недоступна" : "Перевірка бази";
+
+  return (
+    <div className={`db-beacon ${open ? "open" : ""}`} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <button className="db-trigger" onClick={() => setOpen((value) => !value)} aria-label={label} aria-expanded={open}>
+        <span className={health.status} />
+      </button>
+      <div className="db-popover" role="status">
+        <div className="db-popover-head">
+          <span className={`db-status-dot ${health.status}`} />
+          <div><b>{label}</b><small>{health.message}</small></div>
+        </div>
+        <dl>
+          <div><dt>Проєкт</dt><dd>{health.project}</dd></div>
+          <div><dt>Затримка</dt><dd>{health.latency === null ? "—" : `${health.latency} мс`}</dd></div>
+          <div><dt>HTTP</dt><dd>{health.httpStatus ?? "—"}</dd></div>
+          <div><dt>Перевірено</dt><dd>{health.checkedAt ? new Date(health.checkedAt).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—"}</dd></div>
+        </dl>
+        <button className="db-recheck" onClick={() => void check()} disabled={health.status === "checking"}>Перевірити ще раз</button>
+      </div>
+    </div>
   );
 }
 
