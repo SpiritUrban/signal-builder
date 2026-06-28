@@ -343,6 +343,7 @@ function RoadmapCard({
         )}
       </div>
       <textarea value={item.notes} onChange={(event) => onChange({ notes: event.target.value })} placeholder="Додати нотатку..." rows={2} />
+      <NoteLinks notes={item.notes} />
     </article>
   );
 }
@@ -432,8 +433,30 @@ function RoadmapFocusModal({
         <label className="focus-field focus-notes">
           <span>Нотатки</span>
           <textarea value={item.notes} onChange={(event) => onChange({ notes: event.target.value })} placeholder="Додайте деталі, контакти, наступні кроки…" />
+          <NoteLinks notes={item.notes} />
         </label>
       </section>
+    </div>
+  );
+}
+
+function NoteLinks({ notes }: { notes: string }) {
+  const urls = Array.from(new Set(
+    (notes.match(/(?:https?:\/\/|www\.)[^\s<>"']+/gi) ?? [])
+      .map((url) => url.replace(/[.,;:!?)}\]]+$/g, "")),
+  ));
+  if (!urls.length) return null;
+
+  return (
+    <div className="note-links" aria-label="Посилання з нотаток">
+      {urls.map((url) => {
+        const href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+        return (
+          <a href={href} target="_blank" rel="noopener noreferrer" key={url} title={url}>
+            <ExternalLink size={11} /><span>{url}</span>
+          </a>
+        );
+      })}
     </div>
   );
 }

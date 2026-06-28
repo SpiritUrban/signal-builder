@@ -85,6 +85,9 @@ button, input, select, textarea { font: inherit; }
 .service-link:hover { color: var(--cyan); background: #39e6da12; border-color: #39e6da45; opacity: 1; }
 .metrics { display: flex; justify-content: space-between; font-size: 9px; color: var(--muted); margin-bottom: 14px; }.metrics b { color: var(--cyan); letter-spacing: 1px; }
 .card select, .card .url, .card textarea { width: 100%; color: #ccd2df; background: #080b12; border: 1px solid #242a3a; border-radius: 8px; padding: 8px 9px; outline: none; font-size: 11px; margin-top: 7px; }.card textarea { resize: vertical; }
+.note-links { display: flex; flex-wrap: wrap; gap: 5px; max-height: 72px; margin-top: 7px; overflow: auto; }
+.note-links a { min-width: 0; max-width: 100%; display: inline-flex; align-items: center; gap: 5px; padding: 5px 7px; color: #63dcd4; background: #39e6da0c; border: 1px solid #39e6da2d; border-radius: 6px; text-decoration: none; font-size: 9px; transition: background .2s, border-color .2s; }
+.note-links a:hover { background: #39e6da18; border-color: #39e6da65; }.note-links a svg { flex: 0 0 auto; }.note-links a span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .url-field { position: relative; }
 .url-field .url { padding-right: 38px; }
 .url-field a { position: absolute; right: 5px; top: 12px; width: 26px; height: 26px; display: grid; place-items: center; color: var(--cyan); background: #39e6da12; border: 1px solid #39e6da38; border-radius: 6px; transition: background .2s, border-color .2s; }
@@ -104,7 +107,7 @@ button, input, select, textarea { font: inherit; }
 .focus-field { display: flex; flex-direction: column; gap: 7px; min-height: 0; }.focus-field > span { color: #929bae; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .focus-field select, .focus-field input, .focus-field textarea { width: 100%; color: #e5e9f2; background: #080b12; border: 1px solid #293146; border-radius: 10px; padding: 11px 12px; outline: none; font-size: 12px; }.focus-field select:focus, .focus-field input:focus, .focus-field textarea:focus { border-color: #a778ff90; box-shadow: 0 0 0 3px #a778ff10; }
 .focus-field .url-field input { padding-right: 45px; }.focus-field .url-field a { top: 6px; right: 6px; width: 31px; height: 31px; }
-.focus-notes { flex: 1; }.focus-notes textarea { flex: 1; min-height: 150px; resize: none; line-height: 1.6; }
+.focus-notes { flex: 1; }.focus-notes textarea { flex: 1; min-height: 150px; resize: none; line-height: 1.6; }.focus-notes .note-links { flex: 0 0 auto; max-height: 95px; }.focus-notes .note-links a { font-size: 10px; }
 @keyframes focus-fade { from { opacity: 0; } }
 @keyframes focus-rise { from { opacity: 0; transform: translateY(12px) scale(.985); } }
 .company-shell { max-width: 1240px; margin: auto; padding: 42px 24px 80px; }
