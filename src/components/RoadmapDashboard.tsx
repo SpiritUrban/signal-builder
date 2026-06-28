@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AlertCircle, Check, CheckCircle2, CircleDashed, ExternalLink, LoaderCircle, RefreshCw, Search, Sparkles, Target, Zap } from "lucide-react";
+import { AlertCircle, Check, CheckCircle2, CircleDashed, ExternalLink, LoaderCircle, RefreshCw, Search, Sparkles, Target, X, Zap } from "lucide-react";
 import { initialRoadmap } from "@/data/initialRoadmap";
 import { loadRoadmapItems, mergeRoadmapRow, saveRoadmapItem, subscribeToRoadmapChanges } from "@/lib/roadmapRepository";
 import { checkSupabaseHealth, supabaseDebug, type SupabaseHealth } from "@/lib/supabase";
@@ -21,6 +21,7 @@ export function RoadmapDashboard() {
   const [loadError, setLoadError] = useState("");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<RoadmapStatus | "all">("all");
+  const [focusedItemId, setFocusedItemId] = useState<number | null>(null);
   const itemsRef = useRef(items);
   const saveStatesRef = useRef(saveStates);
   const timersRef = useRef(new Map<number, ReturnType<typeof setTimeout>>());
@@ -106,6 +107,7 @@ export function RoadmapDashboard() {
   );
 
   const groups = Array.from(new Set(visible.map((item) => item.level)));
+  const focusedItem = focusedItemId === null ? null : items.find((item) => item.id === focusedItemId) ?? null;
   const updateItem = useCallback((id: number, patch: Partial<RoadmapItem>) => {
     const next = itemsRef.current.map((item) => item.id === id ? { ...item, ...patch } : item);
     itemsRef.current = next;
@@ -125,6 +127,20 @@ export function RoadmapDashboard() {
     const revision = revisionsRef.current.get(id) ?? 0;
     void persistItem(id, 1, revision);
   }, [persistItem]);
+
+  useEffect(() => {
+    if (focusedItemId === null) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setFocusedItemId(null);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [focusedItemId]);
 
   return (
     <main>
@@ -171,6 +187,7 @@ export function RoadmapDashboard() {
                       saveState={saveStates[item.id] ?? { status: "idle", attempt: 0 }}
                       onChange={(patch) => updateItem(item.id, patch)}
                       onRetry={() => retryItem(item.id)}
+                      onOpen={() => setFocusedItemId(item.id)}
                     />
                   ))}
                 </div>
@@ -179,6 +196,15 @@ export function RoadmapDashboard() {
           })}
         </section>
       </div>
+      {focusedItem && (
+        <RoadmapFocusModal
+          item={focusedItem}
+          saveState={saveStates[focusedItem.id] ?? { status: "idle", attempt: 0 }}
+          onChange={(patch) => updateItem(focusedItem.id, patch)}
+          onRetry={() => retryItem(focusedItem.id)}
+          onClose={() => setFocusedItemId(null)}
+        />
+      )}
     </main>
   );
 }
@@ -243,40 +269,33 @@ function RoadmapCard({
   saveState,
   onChange,
   onRetry,
+  onOpen,
 }: {
   item: RoadmapItem;
   saveState: CardSaveState;
   onChange: (patch: Partial<RoadmapItem>) => void;
   onRetry: () => void;
+  onOpen: () => void;
 }) {
   const placementUrl = item.targetUrl.trim();
   const externalUrl = /^https?:\/\//i.test(placementUrl) ? placementUrl : `https://${placementUrl}`;
-  const saveLabel = {
-    idle: "Без змін",
-    pending: "Є незбережені зміни",
-    saving: `Збереження · спроба ${saveState.attempt}/3`,
-    saved: "Збережено у Supabase",
-    error: "Не вдалося зберегти · натисніть, щоб повторити",
-  }[saveState.status];
 
   return (
-    <article className={`card status-${item.status}`}>
+    <article
+      className={`card status-${item.status}`}
+      onClick={(event) => {
+        if (!(event.target as HTMLElement).closest("input, textarea, select, button, a")) onOpen();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && event.target === event.currentTarget) onOpen();
+      }}
+      role="button"
+      tabIndex={0}
+    >
       <div className="card-top">
         <span className="number">{String(item.id).padStart(2, "0")}</span>
         <div className="card-signals">
-          {saveState.status !== "idle" && (
-            <button
-              className={`save-signal ${saveState.status}`}
-              onClick={saveState.status === "error" ? onRetry : undefined}
-              disabled={saveState.status !== "error"}
-              title={saveLabel}
-              aria-label={saveLabel}
-            >
-              {saveState.status === "saving" && <LoaderCircle size={12} />}
-              {saveState.status === "saved" && <Check size={12} />}
-              {saveState.status === "error" && <RefreshCw size={11} />}
-            </button>
-          )}
+          <SaveSignal state={saveState} onRetry={onRetry} />
           <span className={`priority ${item.priority}`}>{item.priority === "high" ? "ВИСОКИЙ" : item.priority === "medium" ? "СЕРЕДНІЙ" : "НИЗЬКИЙ"}</span>
         </div>
       </div>
@@ -295,5 +314,96 @@ function RoadmapCard({
       </div>
       <textarea value={item.notes} onChange={(event) => onChange({ notes: event.target.value })} placeholder="Додати нотатку..." rows={2} />
     </article>
+  );
+}
+
+function SaveSignal({ state, onRetry }: { state: CardSaveState; onRetry: () => void }) {
+  if (state.status === "idle") return null;
+  const label = {
+    idle: "Без змін",
+    pending: "Є незбережені зміни",
+    saving: `Збереження · спроба ${state.attempt}/3`,
+    saved: "Збережено у Supabase",
+    error: "Не вдалося зберегти · натисніть, щоб повторити",
+  }[state.status];
+
+  return (
+    <button
+      className={`save-signal ${state.status}`}
+      onClick={state.status === "error" ? onRetry : undefined}
+      disabled={state.status !== "error"}
+      title={label}
+      aria-label={label}
+    >
+      {state.status === "saving" && <LoaderCircle size={12} />}
+      {state.status === "saved" && <Check size={12} />}
+      {state.status === "error" && <RefreshCw size={11} />}
+    </button>
+  );
+}
+
+function RoadmapFocusModal({
+  item,
+  saveState,
+  onChange,
+  onRetry,
+  onClose,
+}: {
+  item: RoadmapItem;
+  saveState: CardSaveState;
+  onChange: (patch: Partial<RoadmapItem>) => void;
+  onRetry: () => void;
+  onClose: () => void;
+}) {
+  const placementUrl = item.targetUrl.trim();
+  const externalUrl = /^https?:\/\//i.test(placementUrl) ? placementUrl : `https://${placementUrl}`;
+
+  return (
+    <div className="focus-backdrop" onMouseDown={(event) => {
+      if (event.target === event.currentTarget) onClose();
+    }}>
+      <section className={`focus-modal status-${item.status}`} role="dialog" aria-modal="true" aria-labelledby="focus-title">
+        <header className="focus-header">
+          <div>
+            <p>ПУНКТ {String(item.id).padStart(2, "0")} · РІВЕНЬ {item.level}</p>
+            <h2 id="focus-title">{item.title}</h2>
+          </div>
+          <div className="focus-actions">
+            <SaveSignal state={saveState} onRetry={onRetry} />
+            <button className="focus-close" onClick={onClose} aria-label="Закрити"><X size={19} /></button>
+          </div>
+        </header>
+
+        <div className="focus-meta">
+          <span>{item.category}</span>
+          <span>SEO <b>{"●".repeat(item.seoValue)}</b></span>
+          <span>Складність <b>{"●".repeat(item.difficulty)}</b></span>
+        </div>
+
+        <label className="focus-field">
+          <span>Статус</span>
+          <select value={item.status} onChange={(event) => onChange({ status: event.target.value as RoadmapStatus })}>
+            {Object.entries(statusLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+          </select>
+        </label>
+
+        <label className="focus-field">
+          <span>URL розміщення</span>
+          <div className="url-field">
+            <input value={item.targetUrl} onChange={(event) => onChange({ targetUrl: event.target.value })} placeholder="https://..." />
+            {placementUrl && (
+              <a href={externalUrl} target="_blank" rel="noopener noreferrer" aria-label="Відкрити URL у новій вкладці" title="Відкрити у новій вкладці">
+                <ExternalLink size={15} />
+              </a>
+            )}
+          </div>
+        </label>
+
+        <label className="focus-field focus-notes">
+          <span>Нотатки</span>
+          <textarea value={item.notes} onChange={(event) => onChange({ notes: event.target.value })} placeholder="Додайте деталі, контакти, наступні кроки…" />
+        </label>
+      </section>
+    </div>
   );
 }
