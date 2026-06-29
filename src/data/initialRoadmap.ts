@@ -40,6 +40,7 @@ const serviceUrls: Record<string, string> = {
   Where2Go: "https://www.where2go.com/",
   ChamberofCommerce: "https://www.chamberofcommerce.com/",
   Yalwa: "https://www.yalwa.com/",
+  Locanto: "https://www.locanto.pl/",
   OLX: "https://www.olx.ua/",
   Flagma: "https://flagma.ua/",
   "Obyava.ua": "https://obyava.ua/",
@@ -83,13 +84,15 @@ const serviceUrls: Record<string, string> = {
   "Новини LIVE": "https://novyny.live/",
 };
 
+const yalwaClosedNotes = 'Yalwa Business Directory officially closed. Сайт показує повідомлення "The Yalwa Business Directory is now closed" та перенаправляє користувачів на Locanto.';
+
 function getServiceUrl(title: string) {
   if (serviceUrls[title]) return serviceUrls[title];
   if (/^\d{3,4}\.ua$/.test(title)) return `https://${title}/`;
   return `https://www.google.com/search?q=${encodeURIComponent(title)}`;
 }
 
-export const initialRoadmap: RoadmapItem[] = levels.flatMap((group, level) =>
+const generatedRoadmap: RoadmapItem[] = levels.flatMap((group, level) =>
   group.names.map((title) => {
     const id = levels.slice(0, level).reduce((sum, item) => sum + item.names.length, 0) + group.names.indexOf(title) + 1;
     return {
@@ -97,15 +100,37 @@ export const initialRoadmap: RoadmapItem[] = levels.flatMap((group, level) =>
       title,
       category: group.category,
       level: level + 1,
-      priority: id <= 30 ? "high" : id <= 60 ? "medium" : "low",
-      status: "planned",
+      priority: title === "Yalwa" ? "none" : id <= 30 ? "high" : id <= 60 ? "medium" : "low",
+      status: title === "Yalwa" ? "closed" : "planned",
       url: getServiceUrl(title),
       targetUrl: "",
       seoValue: Math.max(2, 6 - Math.ceil((level + 1) / 2)),
       difficulty: Math.min(5, 1 + Math.floor(level / 2)),
       recommendedText: description,
-      notes: "",
+      notes: title === "Yalwa" ? yalwaClosedNotes : "",
+      lastChecked: title === "Yalwa" ? "2026-06-29" : undefined,
+      archived: title === "Yalwa",
       updatedAt: "",
     } satisfies RoadmapItem;
   }),
 );
+
+export const initialRoadmap: RoadmapItem[] = [
+  ...generatedRoadmap,
+  {
+    id: generatedRoadmap.length + 1,
+    title: "Locanto",
+    category: "Оголошення",
+    level: 4,
+    priority: "low",
+    status: "not_evaluated",
+    url: getServiceUrl("Locanto"),
+    targetUrl: "",
+    serviceType: "Classifieds / Local Ads",
+    seoValue: 2,
+    difficulty: 2,
+    recommendedText: description,
+    notes: "Не є класичним бізнес-каталогом. Потребує окремої оцінки SEO-користі для My Transfer.",
+    updatedAt: "",
+  },
+];

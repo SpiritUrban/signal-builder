@@ -1,4 +1,5 @@
-export type RoadmapStatus = "planned" | "in_progress" | "done" | "skipped" | "problem";
+export type RoadmapStatus = "planned" | "in_progress" | "done" | "skipped" | "problem" | "closed" | "not_evaluated";
+export type RoadmapPriority = "high" | "medium" | "low" | "none";
 
 export type RoadmapCategory =
   | "Карти"
@@ -17,14 +18,17 @@ export interface RoadmapItem {
   title: string;
   category: RoadmapCategory;
   level: number;
-  priority: "high" | "medium" | "low";
+  priority: RoadmapPriority;
   status: RoadmapStatus;
   url: string;
   targetUrl: string;
+  serviceType?: string;
   seoValue: number;
   difficulty: number;
   recommendedText: string;
   notes: string;
+  lastChecked?: string;
+  archived?: boolean;
   updatedAt: string;
 }
 

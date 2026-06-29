@@ -15,9 +15,11 @@ const statusLabels: Record<RoadmapStatus, string> = {
   done: "Готово",
   skipped: "Пропущено",
   problem: "Проблема",
+  closed: "Closed",
+  not_evaluated: "Not Evaluated",
 };
 
-export function RoadmapDashboard() {
+export function RoadmapDashboard({ view = "active" }: { view?: "active" | "closed" }) {
   const [items, setItems] = useState<RoadmapItem[]>(initialRoadmap);
   const [saveStates, setSaveStates] = useState<Record<number, CardSaveState>>({});
   const [loadError, setLoadError] = useState("");
@@ -100,11 +102,21 @@ export function RoadmapDashboard() {
   const stats = useMemo(() => {
     const done = items.filter((item) => item.status === "done").length;
     const active = items.filter((item) => item.status === "in_progress").length;
-    return { done, active, planned: items.filter((item) => item.status === "planned").length, progress: Math.round((done / items.length) * 100) };
+    const blocked = items.filter((item) => item.status === "problem").length;
+    const closed = items.filter((item) => item.status === "closed").length;
+    const actionable = items.filter((item) => !item.archived && item.status !== "closed").length;
+    return {
+      done,
+      active,
+      blocked,
+      closed,
+      progress: actionable ? Math.round((done / actionable) * 100) : 0,
+    };
   }, [items]);
 
   const visible = items.filter((item) =>
-    (filter === "all" || item.status === filter) &&
+    (view === "closed" ? item.status === "closed" || item.archived : item.status !== "closed" && !item.archived) &&
+    (view === "closed" || filter === "all" || item.status === filter) &&
     `${item.title} ${item.category}`.toLowerCase().includes(query.toLowerCase()),
   );
 
@@ -157,7 +169,7 @@ export function RoadmapDashboard() {
         <div className="topbar-left">
           <Link href="/" className="brand"><span className="brand-mark"><Sparkles size={18} /></span><span>MY TRANSFER</span></Link>
           <nav className="main-nav" aria-label="Основна навігація">
-            <Link href="/" className="active">Roadmap</Link>
+            <Link href="/" className={view === "active" ? "active" : ""}>Roadmap</Link>
             <Link href="/company">Company Info</Link>
           </nav>
         </div>
@@ -171,24 +183,30 @@ export function RoadmapDashboard() {
       <div className="shell">
         {loadError && <div className="sync-error-banner"><AlertCircle size={15} />{loadError}</div>}
         <section className="hero">
-          <div><p className="eyebrow">SEO COMMAND CENTER</p><h1>План присутності<br /><span>My Transfer</span></h1><p>Усі майданчики, статуси та нотатки — в одному робочому просторі.</p></div>
-          <div className="orbit"><Target size={38} /><b>{stats.progress}%</b><small>загальний прогрес</small></div>
+          {view === "closed" ? (
+            <div><p className="eyebrow">SERVICE ARCHIVE</p><h1>Закриті<br /><span>сервіси</span></h1><p>Архів каталогів і платформ, які більше не використовуються. Записи збережені разом з історією та примітками.</p></div>
+          ) : (
+            <div><p className="eyebrow">SEO COMMAND CENTER</p><h1>План присутності<br /><span>My Transfer</span></h1><p>Усі майданчики, статуси та нотатки — в одному робочому просторі.</p></div>
+          )}
+          <div className="orbit"><Target size={38} /><b>{view === "closed" ? stats.closed : `${stats.progress}%`}</b><small>{view === "closed" ? "записів в архіві" : "загальний прогрес"}</small></div>
         </section>
 
         <section className="stats-grid">
-          <Stat icon={<CheckCircle2 />} value={stats.done} label="Виконано" tone="cyan" />
           <Stat icon={<Zap />} value={stats.active} label="В роботі" tone="violet" />
-          <Stat icon={<CircleDashed />} value={stats.planned} label="Заплановано" tone="lime" />
-          <Stat icon={<Target />} value={items.length} label="Усього пунктів" tone="orange" />
+          <Stat icon={<AlertCircle />} value={stats.blocked} label="Заблоковано" tone="orange" />
+          <Stat icon={<CircleDashed />} value={stats.closed} label="Закрито" tone="lime" />
+          <Stat icon={<CheckCircle2 />} value={stats.done} label="Завершено" tone="cyan" />
         </section>
 
         <section className="toolbar">
           <label><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Знайти майданчик..." /></label>
-          <div className="filters">
-            {(["all", "planned", "in_progress", "done", "problem"] as const).map((value) =>
-              <button key={value} className={filter === value ? "active" : ""} onClick={() => setFilter(value)}>{value === "all" ? "Усі" : statusLabels[value]}</button>
-            )}
-          </div>
+          {view === "active" && (
+            <div className="filters">
+              {(["all", "planned", "not_evaluated", "in_progress", "done", "problem"] as const).map((value) =>
+                <button key={value} className={filter === value ? "active" : ""} onClick={() => setFilter(value)}>{value === "all" ? "Усі" : statusLabels[value]}</button>
+              )}
+            </div>
+          )}
         </section>
 
         <section className="roadmap">
@@ -314,7 +332,7 @@ function RoadmapCard({
         <span className="number">{String(item.id).padStart(2, "0")}</span>
         <div className="card-signals">
           <SaveSignal state={saveState} onRetry={onRetry} />
-          <span className={`priority ${item.priority}`}>{item.priority === "high" ? "ВИСОКИЙ" : item.priority === "medium" ? "СЕРЕДНІЙ" : "НИЗЬКИЙ"}</span>
+          <span className={`priority ${item.priority}`}>{item.priority === "high" ? "ВИСОКИЙ" : item.priority === "medium" ? "СЕРЕДНІЙ" : item.priority === "low" ? "НИЗЬКИЙ" : "NONE"}</span>
         </div>
       </div>
       <div className="card-title-row">
@@ -331,6 +349,13 @@ function RoadmapCard({
         </a>
       </div>
       <div className="metrics"><span>SEO <b>{"●".repeat(item.seoValue)}</b></span><span>Складність <b>{"●".repeat(item.difficulty)}</b></span></div>
+      {(item.archived || item.serviceType || item.lastChecked) && (
+        <div className="card-meta">
+          {item.archived && <span>Archived</span>}
+          {item.serviceType && <span>{item.serviceType}</span>}
+          {item.lastChecked && <span>Last checked: {item.lastChecked}</span>}
+        </div>
+      )}
       <select value={item.status} onChange={(event) => onChange({ status: event.target.value as RoadmapStatus })}>
         {Object.entries(statusLabels).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
       </select>
@@ -407,6 +432,9 @@ function RoadmapFocusModal({
 
         <div className="focus-meta">
           <span>{item.category}</span>
+          {item.archived && <span>Archived</span>}
+          {item.serviceType && <span>{item.serviceType}</span>}
+          {item.lastChecked && <span>Last checked: {item.lastChecked}</span>}
           <span>SEO <b>{"●".repeat(item.seoValue)}</b></span>
           <span>Складність <b>{"●".repeat(item.difficulty)}</b></span>
         </div>

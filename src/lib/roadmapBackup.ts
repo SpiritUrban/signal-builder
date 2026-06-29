@@ -2,7 +2,7 @@ import type { RoadmapItem, RoadmapStatus } from "./types";
 
 const FORMAT = "my-transfer-roadmap-backup";
 const VERSION = 1;
-const allowedStatuses = new Set<RoadmapStatus>(["planned", "in_progress", "done", "skipped", "problem"]);
+const allowedStatuses = new Set<RoadmapStatus>(["planned", "in_progress", "done", "skipped", "problem", "closed", "not_evaluated"]);
 
 export interface RoadmapBackup {
   format: typeof FORMAT;
