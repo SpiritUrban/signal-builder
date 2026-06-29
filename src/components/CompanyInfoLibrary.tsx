@@ -8,6 +8,7 @@ import { DirectoryCredentialsPanel } from "./DirectoryCredentialsPanel";
 
 export function CompanyInfoLibrary() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedKeyword, setCopiedKeyword] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => {
@@ -17,8 +18,17 @@ export function CompanyInfoLibrary() {
   const copy = async (block: CompanyInfoBlock) => {
     await navigator.clipboard.writeText(block.content);
     setCopiedId(block.id);
+    setCopiedKeyword(null);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setCopiedId(null), 1800);
+  };
+
+  const copyKeyword = async (keyword: string) => {
+    await navigator.clipboard.writeText(keyword);
+    setCopiedId(null);
+    setCopiedKeyword(keyword);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setCopiedKeyword(null), 1800);
   };
 
   return (
@@ -54,7 +64,20 @@ export function CompanyInfoLibrary() {
               {block.type === "list" ? (
                 <ul>{block.content.split("\n").filter(Boolean).map((line) => <li key={line}>{line}</li>)}</ul>
               ) : block.type === "keywords" ? (
-                <div className="keyword-cloud">{block.content.split("\n").map((word) => <span key={word}>{word}</span>)}</div>
+                <div className="keyword-cloud">
+                  {block.content.split("\n").filter(Boolean).map((word) => (
+                    <button
+                      type="button"
+                      className={copiedKeyword === word ? "copied" : ""}
+                      key={word}
+                      onClick={() => void copyKeyword(word)}
+                      aria-label={`Copy keyword: ${word}`}
+                      title={copiedKeyword === word ? "Copied" : "Copy keyword"}
+                    >
+                      {word}
+                    </button>
+                  ))}
+                </div>
               ) : (
                 <p className="info-content">{block.content}</p>
               )}
