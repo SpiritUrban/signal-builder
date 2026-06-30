@@ -39,6 +39,7 @@ export function CompanyInfoLibrary() {
           <nav className="main-nav" aria-label="Основна навігація">
             <Link href="/">Roadmap</Link>
             <Link href="/company" className="active">Company Info</Link>
+            <Link href="/content">Content</Link>
           </nav>
         </div>
         <span className="company-ready">{companyInfoBlocks.length} готових блоків</span>

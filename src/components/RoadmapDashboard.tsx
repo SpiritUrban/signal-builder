@@ -171,6 +171,7 @@ export function RoadmapDashboard({ view = "active" }: { view?: "active" | "close
           <nav className="main-nav" aria-label="Основна навігація">
             <Link href="/" className={view === "active" ? "active" : ""}>Roadmap</Link>
             <Link href="/company">Company Info</Link>
+            <Link href="/content">Content</Link>
           </nav>
         </div>
         <div className="top-progress"><span>{stats.progress}% виконано</span><div><i style={{ width: `${stats.progress}%` }} /></div></div>
